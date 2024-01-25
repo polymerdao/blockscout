@@ -462,6 +462,45 @@ defmodule EthereumJSONRPC.Block do
     }
   end
 
+  # Peptide: a response from eth_getblockbyhash does not contain: miner, size, totalDifficulty or uncles
+  defp do_elixir_to_params(
+         %{
+           "difficulty" => difficulty,
+           "extraData" => extra_data,
+           "gasLimit" => gas_limit,
+           "gasUsed" => gas_used,
+           "hash" => hash,
+           "logsBloom" => logs_bloom,
+           "number" => number,
+           "parentHash" => parent_hash,
+           "receiptsRoot" => receipts_root,
+           "sha3Uncles" => sha3_uncles,
+           "stateRoot" => state_root,
+           "timestamp" => timestamp,
+           "transactionsRoot" => transactions_root,
+         } = elixir
+       ) do
+    %{
+      difficulty: difficulty,
+      extra_data: extra_data,
+      gas_limit: gas_limit,
+      gas_used: gas_used,
+      hash: hash,
+      logs_bloom: logs_bloom,
+      mix_hash: Map.get(elixir, "mixHash", "0x0"),
+      nonce: Map.get(elixir, "nonce", 0),
+      number: number,
+      parent_hash: parent_hash,
+      receipts_root: receipts_root,
+      sha3_uncles: sha3_uncles,
+      state_root: state_root,
+      timestamp: timestamp,
+      transactions_root: transactions_root,
+      withdrawals_root:
+        Map.get(elixir, "withdrawalsRoot", "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421")
+    }
+  end
+
   defp chain_type_fields(params, elixir) do
     case Application.get_env(:explorer, :chain_type) do
       "rsk" ->
@@ -623,6 +662,15 @@ defmodule EthereumJSONRPC.Block do
     |> Enum.with_index()
     |> Enum.map(fn {uncle_hash, index} -> %{"hash" => uncle_hash, "nephewHash" => nephew_hash, "index" => index} end)
   end
+
+  def elixir_to_uncles(%{"hash" => _}) do
+      # Handle the case where "uncles" key is missing
+      # For example, return an empty list or some default value
+      []
+  end
+
+  # You can also add a catch-all clause to handle other unexpected cases
+  def elixir_to_uncles(_), do: []
 
   @doc """
   Get `t:EthereumJSONRPC.Withdrawals.elixir/0` from `t:elixir/0`.
