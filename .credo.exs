@@ -140,7 +140,7 @@
         {Credo.Check.Refactor.AppendSingleItem},
         {Credo.Check.Refactor.VariableRebinding},
         {Credo.Check.Warning.MapGetUnsafePass},
-        {Credo.Check.Consistency.MultiAliasImportRequireUse}
+        {Credo.Check.Consistency.MultiAliasImportRequireUse},
 
         # Custom checks can be created using `mix credo.gen.check`.
         #
